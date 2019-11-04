@@ -1,18 +1,34 @@
 import React from 'react';
 import { MdRemoveCircleOutline, MdAddCircleOutline, MdDelete} from 'react-icons/md';
-import { connect } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Container, ProductTable, Total } from './styles';
 import * as CartActions from '../../store/modules/cart/actions';
-import { bindActionCreators } from 'redux';
 import { formatPrice } from '../../utils/format';
 
-function Cart({cart, removeFromCart, updateAmountRequest, total}) {
+export default function Cart() {
+  const total = useSelector(state => {
+    //reduce utilizamos quando queremos pegar um array e reduzir a um único valor.
+    formatPrice(state.cart.reduce((totalSum, product) => {
+    return totalSum + product.price *  product.amount; // A cada interação calcula o total e no fim retorna para a variavel total.
+  }, 0))// inicia com valor zero.
+  });
+
+  const cart = useSelector(state => {
+    return state.cart.map(product => ({
+      ...product,
+      subtotal: formatPrice(product.price * product.amount),
+    }))
+  });useDispatch();
+
+  const dispath = useDispatch();
+
+
   function increment(product){
-    updateAmountRequest(product.id, product.amount + 1);
+    dispath(CartActions.updateAmountRequest(product.id, product.amount + 1));
   }
 
   function decrement(product){
-    updateAmountRequest(product.id, product.amount - 1);
+    dispath(CartActions.updateAmountRequest(product.id, product.amount - 1));
   }
 
   return (
@@ -28,7 +44,7 @@ function Cart({cart, removeFromCart, updateAmountRequest, total}) {
         </tr>
         </thead>
         <tbody>
-          { cart.map(product => (
+          {cart.map(product => (
             <tr>
             <td>
               <img src={product.image} alt={product.title} />
@@ -52,7 +68,7 @@ function Cart({cart, removeFromCart, updateAmountRequest, total}) {
               <strong>{product.subtotal}</strong>
             </td>
             <td>
-              <button type="button" onClick={() => removeFromCart(product.id)}>
+              <button type="button" onClick={() => dispath(CartActions.removeFromCart(product.id))}>
                 <MdDelete size={20} color="#7159c1"/>
               </button>
             </td>
@@ -71,21 +87,3 @@ function Cart({cart, removeFromCart, updateAmountRequest, total}) {
    </Container>
   );
 }
-
-// Função que pega informações do estado e mapeia no formato de propriedades do componente
-const  mapStateToProps = state => ({
-  cart: state.cart.map(product => ({
-    ...product,
-    subtotal: formatPrice(product.price * product.amount),
-  })),
-  //reduce utilizamos quando queremos pegar um array e reduzir a um único valor.
-  total: formatPrice(state.cart.reduce((total, product) => {
-    return total + product.price *  product.amount; // A cada interação calcula o total e no fim retorna para a variavel total.
-  }, 0)), // inicia com valor zero.
-});
-
-//Converte actions em propriedades de componentes.
-const mapDispatchToProps = dispatch =>
-  bindActionCreators(CartActions, dispatch);
-
-export default connect(mapStateToProps, mapDispatchToProps)(Cart);

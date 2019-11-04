@@ -9,6 +9,7 @@ module.exports = {
   plugins: [
     'prettier',
     'react',
+    'react-hooks',
   ],
   globals: {
     Atomics: 'readonly',
@@ -25,6 +26,9 @@ module.exports = {
     "no-param-reassign": "off",
     "camelcase": "off",
     "no-unused-vars": ["error", { "argsIgnorePattern": "next"}],
-    'no-console': ["error", {allow: ["tron"]}]
+    'no-console': ["error", {allow: ["tron"]}],
+
+    'react-hooks/rules-of-hooks': 'error', //Irá avisar qualquer tentativa de uso que infligir as regras de uso do React Hooks,
+    'react-hooks/exhaustive-deps': 'warn', //Avisa se está faltando alguma dependencian no uso dos Hooks Effects.
   },
 };
